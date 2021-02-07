@@ -21,28 +21,32 @@ import (
 // GetUsers function
 func GetUsers(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 	t := token.Token(strings.Split(c.Request.Header["Authorization"][0], "Bearer ")[1])
 	res, err := t.Validate()
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, nil)
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, responses.New401("Token expired"))
+		c.JSON(http.StatusUnauthorized, "")
+		return
 	}
 
 	if res == "unauthorized" {
 		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		return
 	}
 
 	if res == "authorized" {
-		responseData := []string{}
-		for _, u := range user.Users {
-			responseData = append(responseData, u.Email)
+		//  make allocates the amount you want ahead of time
+		responseData := make([]string, len(user.Users))
+		// responseData := []string{}
+		for i := range user.Users {
+			responseData[i] = user.Users[i].Email
 		}
 		fmt.Println(responseData)
 		c.JSON(http.StatusOK, responses.New200GetUsers(responseData))
