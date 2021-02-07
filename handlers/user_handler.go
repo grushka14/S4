@@ -199,7 +199,13 @@ func DeleteFile(c *gin.Context) {
 	}
 
 	os.Remove(basePah + userId + "/" + fileName)
-
+	ok, err := user.RemoveFileFromUserMemory(email, fileId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "")
+	}
+	if !ok {
+		c.JSON(http.StatusInternalServerError, "")
+	}
 	fmt.Println(fileId)
 	c.JSON(http.StatusOK, responses.New204("deleted"))
 }
