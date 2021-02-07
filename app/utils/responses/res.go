@@ -1,6 +1,8 @@
 package responses
 
-import "asaf_project/src/domain/token"
+import (
+	"github.com/grushka14/S4/domain/token"
+)
 
 // Response type
 type Response struct {
