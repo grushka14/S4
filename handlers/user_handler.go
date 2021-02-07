@@ -78,7 +78,7 @@ func Login(c *gin.Context) {
 // PutFile function
 func PutFile(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
@@ -86,28 +86,28 @@ func PutFile(c *gin.Context) {
 	res, err := t.Validate()
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, responses.New401("Token expired"))
+		c.JSON(http.StatusUnauthorized, "Token expired")
 		return
 	}
 
 	if res == "unauthorized" {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	email, ok := t.GetEmail()
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	userId, ok := user.GetUserId(email)
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
@@ -148,7 +148,7 @@ func PutFile(c *gin.Context) {
 // DeleteFile function
 func DeleteFile(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
@@ -156,45 +156,45 @@ func DeleteFile(c *gin.Context) {
 	res, err := t.Validate()
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, responses.New401("Token expired"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	if res == "unauthorized" {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	email, ok := t.GetEmail()
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	userId, ok := user.GetUserId(email)
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	fileId := c.Query("file-id")
 	if fileId == "" {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	owner, fileName, exist := user.CheckFile(fileId)
 	if !exist {
-		c.JSON(http.StatusBadRequest, responses.New400("no file with that name"))
+		c.JSON(http.StatusBadRequest, "no file with that name")
 		return
 	}
 
 	if owner != email {
-		c.JSON(http.StatusBadRequest, responses.New401("this file does not belong to you"))
+		c.JSON(http.StatusUnauthorized, "this file does not belong to you")
 
 	}
 
@@ -207,7 +207,7 @@ func DeleteFile(c *gin.Context) {
 // GetFiles function
 func GetFiles(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
@@ -215,22 +215,22 @@ func GetFiles(c *gin.Context) {
 	res, err := t.Validate()
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, responses.New401("Token expired"))
+		c.JSON(http.StatusUnauthorized, "Token expired")
 		return
 	}
 
 	if res == "unauthorized" {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	email, ok := t.GetEmail()
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
@@ -249,58 +249,58 @@ func ReadFile(c *gin.Context) {
 	res, err := t.Validate()
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, responses.New401("Token expired"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	if res == "unauthorized" {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	email, ok := t.GetEmail()
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	userId, ok := user.GetUserId(email)
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	fileId := c.Query("file-id")
 	if fileId == "" {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	owner, fileName, exist := user.CheckFile(fileId)
 	if !exist {
-		c.JSON(http.StatusBadRequest, responses.New400("no file with that id"))
+		c.JSON(http.StatusBadRequest, "no file with that id")
 		return
 	}
 
 	if owner != email {
-		c.JSON(http.StatusBadRequest, responses.New401("this file does not belong to you"))
+		c.JSON(http.StatusUnauthorized, "this file does not belong to you")
 		return
 	}
 
 	file, err := ioutil.ReadFile(basePah + userId + "/" + fileName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	key := user.GetUserKey(email)
 	decryptedfile, err := encryption.Decrypt(key, file)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 	c.JSON(http.StatusOK, responses.New200ReadFile(decryptedfile))
@@ -309,7 +309,7 @@ func ReadFile(c *gin.Context) {
 // ShareFile function
 func ShareFile(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
@@ -317,59 +317,59 @@ func ShareFile(c *gin.Context) {
 	res, err := t.Validate()
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, responses.New401("Token expired"))
+		c.JSON(http.StatusUnauthorized, "Token expired")
 		return
 	}
 
 	if res == "unauthorized" {
-		c.JSON(http.StatusUnauthorized, responses.New401("unauthorized"))
+		c.JSON(http.StatusUnauthorized, "")
 		return
 	}
 
 	var data user.ShareUser
 	if err := c.ShouldBindBodyWith(&data, binding.JSON); err != nil {
 		fmt.Println("Invalid JSON")
-		c.JSON(http.StatusBadRequest, "bad_request")
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	email, ok := t.GetEmail()
 	if !ok {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	myId, _ := user.GetUserId(email)
 	if myId == data.UserId {
-		c.JSON(http.StatusBadRequest, responses.New400("can not share file with your selfe"))
+		c.JSON(http.StatusBadRequest, "can not share file with your selfe")
 		return
 	}
 
 	owner, fileName, exist := user.CheckFile(data.FileId)
 	if !exist {
-		c.JSON(http.StatusBadRequest, responses.New400("no file with that id"))
+		c.JSON(http.StatusBadRequest, "no file with that id")
 		return
 	}
 
 	if owner != email {
-		c.JSON(http.StatusBadRequest, responses.New401("this file does not belong to you"))
+		c.JSON(http.StatusBadRequest, "this file does not belong to you")
 		return
 	}
 
 	file, err := ioutil.ReadFile(basePah + myId + "/" + fileName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	key := user.GetUserKey(email)
 	decryptedfile, err := encryption.Decrypt(key, file)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, responses.New400("bad_request"))
+		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
@@ -377,7 +377,7 @@ func ShareFile(c *gin.Context) {
 	out, err := os.Create(basePah + data.UserId + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusInternalServerError, "internal server error")
+		c.JSON(http.StatusInternalServerError, "")
 		return
 	}
 
