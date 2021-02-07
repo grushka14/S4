@@ -62,14 +62,13 @@ func Login(c *gin.Context) {
 	}
 
 	if userObj.CheckEmail() == true {
-		email := userObj.Email
-		token, err := token.CreateToken(email)
+		data, err := token.CreateToken(userObj)
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, "")
 			return
 		}
-		c.JSON(http.StatusOK, responses.New200Login(token))
+		c.JSON(http.StatusOK, responses.New200Login(data))
 		return
 	}
 
