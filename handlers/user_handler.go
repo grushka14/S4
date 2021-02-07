@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"asaf_project/src/app/utils/responses"
-	"asaf_project/src/domain/token"
-	"asaf_project/src/domain/user"
-	"asaf_project/src/encryption"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/grushka14/S4/app/utils/responses"
+	"github.com/grushka14/S4/domain/token"
+	"github.com/grushka14/S4/domain/user"
+	"github.com/grushka14/S4/encryption"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -53,15 +54,15 @@ func GetUsers(c *gin.Context) {
 
 // Login function
 func Login(c *gin.Context) {
-	var user user.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var userObj user.User
+	if err := c.ShouldBindJSON(&userObj); err != nil {
 		fmt.Println("Invalid JSON")
 		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
-	if user.CheckEmail() == true {
-		token, err := token.CreateToken(user)
+	if userObj.CheckEmail() == true {
+		token, err := token.CreateToken(userObj)
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, "")

@@ -1,6 +1,6 @@
 package main
 
-import "asaf_project/src/app"
+import "github.com/grushka14/S4/app"
 
 func main() {
 	app.StartApp()

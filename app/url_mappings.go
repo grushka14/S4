@@ -1,6 +1,6 @@
 package app
 
-import "asaf_project/src/handlers"
+import "github.com/grushka14/S4/handlers"
 
 func mapUrls() {
 	router.GET("/v1/auth", handlers.Login)

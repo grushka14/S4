@@ -1,10 +1,11 @@
 package token
 
 import (
-	"asaf_project/src/domain/user"
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/grushka14/S4/domain/user"
 
 	"github.com/dgrijalva/jwt-go"
 )
