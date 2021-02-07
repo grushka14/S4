@@ -199,16 +199,20 @@ func DeleteFile(c *gin.Context) {
 	}
 	path, _ := filepath.Abs("../S4/files")
 	path = strings.Replace(path, "\\", "/", -1)
-	os.Remove(path + userId + "/" + fileName)
+	os.Remove(path + "/" + userId + "/" + fileName)
 	ok, err = user.RemoveFileFromUserMemory(email, fileId)
 	if err != nil {
+		fmt.Println("1")
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "")
 	}
 	if !ok {
+		fmt.Println("2")
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "")
 	}
 	fmt.Println(fileId)
-	c.JSON(http.StatusOK, responses.New204("deleted"))
+	c.JSON(http.StatusOK, "deleted")
 }
 
 // GetFiles function
@@ -260,7 +264,7 @@ func ReadFile(c *gin.Context) {
 		return
 	}
 	if res == "expired" {
-		c.JSON(http.StatusUnauthorized, "")
+		c.JSON(http.StatusUnauthorized, "Token expired")
 		return
 	}
 
@@ -299,16 +303,16 @@ func ReadFile(c *gin.Context) {
 	}
 	path, _ := filepath.Abs("../S4/files")
 	path = strings.Replace(path, "\\", "/", -1)
-	file, err := ioutil.ReadFile(path + userId + "/" + fileName)
+	file, err := ioutil.ReadFile(path + "/" + userId + "/" + fileName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "")
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
 	key := user.GetUserKey(email)
 	decryptedfile, err := encryption.Decrypt(key, file)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "")
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	c.JSON(http.StatusOK, responses.New200ReadFile(decryptedfile))
@@ -369,7 +373,7 @@ func ShareFile(c *gin.Context) {
 	}
 	path, _ := filepath.Abs("../S4/files")
 	path = strings.Replace(path, "\\", "/", -1)
-	file, err := ioutil.ReadFile(path + myId + "/" + fileName)
+	file, err := ioutil.ReadFile(path + "/" + myId + "/" + fileName)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "")
 		return
@@ -383,7 +387,7 @@ func ShareFile(c *gin.Context) {
 	}
 
 	generatedFileName := strings.Replace(uuid.New().String(), "-", "", -1)
-	out, err := os.Create(path + data.UserId + "/" + generatedFileName)
+	out, err := os.Create(path + "/" + data.UserId + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "")

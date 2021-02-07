@@ -163,6 +163,7 @@ func RemoveFileFromUserMemory(e string, f string) (bool, error) {
 				if file.FileId == f {
 					newFileSlice := append(u.Files[:j], u.Files[j+1:]...)
 					Users[i].Files = newFileSlice
+					return true, nil
 				}
 			}
 		}

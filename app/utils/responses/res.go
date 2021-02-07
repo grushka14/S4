@@ -43,8 +43,6 @@ func New400(m string) *Response {
 // New200 func
 func New200(m string) *Response {
 	return &Response{
-		Code:    200,
-		Status:  "ok",
 		Message: m,
 	}
 }
@@ -63,15 +61,6 @@ func New401(m string) *Response {
 	return &Response{
 		Code:    401,
 		Status:  "unauthorized",
-		Message: m,
-	}
-}
-
-// New204 func
-func New204(m string) *Response {
-	return &Response{
-		Code:    204,
-		Status:  "resource deleted",
 		Message: m,
 	}
 }
