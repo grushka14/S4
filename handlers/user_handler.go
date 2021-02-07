@@ -142,7 +142,7 @@ func PutFile(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	c.JSON(http.StatusCreated, responses.New201("created"))
+	c.JSON(http.StatusCreated, "created")
 }
 
 // DeleteFile function
@@ -201,7 +201,7 @@ func DeleteFile(c *gin.Context) {
 	os.Remove(basePah + userId + "/" + fileName)
 
 	fmt.Println(fileId)
-	c.JSON(http.StatusBadRequest, responses.New204("deleted"))
+	c.JSON(http.StatusOK, responses.New204("deleted"))
 }
 
 // GetFiles function
@@ -396,5 +396,5 @@ func ShareFile(c *gin.Context) {
 		name = fileName
 	}
 	user.AddFileToUser(newUserEmail, generatedFileName, name)
-	c.JSON(http.StatusCreated, responses.New201("created"))
+	c.JSON(http.StatusCreated, "created")
 }
