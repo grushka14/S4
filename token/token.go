@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/grushka14/S4/domain/user"
+	user "github.com/grushka14/S4/domain/user"
 
 	"github.com/dgrijalva/jwt-go"
 )

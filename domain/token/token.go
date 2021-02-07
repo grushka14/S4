@@ -5,8 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/grushka14/S4/domain/user"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 const secret = "supersecretkeyblabla"
