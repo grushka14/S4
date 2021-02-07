@@ -18,8 +18,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const basePah = "C:/Users/grush/go/src/asaf_project/src/files/"
-
 // GetUsers function
 func GetUsers(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
@@ -126,10 +124,9 @@ func PutFile(c *gin.Context) {
 	user.AddFileToUser(email, generatedFileName, filename)
 
 	fmt.Println(generatedFileName)
-	path, _ := filepath.Abs("../files")
-	fmt.Printf("--")
-	fmt.Printf(path)
-	out, err := os.Create(path + userId + "/" + generatedFileName)
+	path, _ := filepath.Abs("../S4/files")
+	path = strings.Replace(path, "\\", "/", -1)
+	out, err := os.Create(path + "/" + userId + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "internal server error")
@@ -200,8 +197,9 @@ func DeleteFile(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "this file does not belong to you")
 
 	}
-
-	os.Remove(basePah + userId + "/" + fileName)
+	path, _ := filepath.Abs("../S4/files")
+	path = strings.Replace(path, "\\", "/", -1)
+	os.Remove(path + userId + "/" + fileName)
 	ok, err = user.RemoveFileFromUserMemory(email, fileId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "")
@@ -299,8 +297,9 @@ func ReadFile(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "this file does not belong to you")
 		return
 	}
-
-	file, err := ioutil.ReadFile(basePah + userId + "/" + fileName)
+	path, _ := filepath.Abs("../S4/files")
+	path = strings.Replace(path, "\\", "/", -1)
+	file, err := ioutil.ReadFile(path + userId + "/" + fileName)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "")
 		return
@@ -368,8 +367,9 @@ func ShareFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "this file does not belong to you")
 		return
 	}
-
-	file, err := ioutil.ReadFile(basePah + myId + "/" + fileName)
+	path, _ := filepath.Abs("../S4/files")
+	path = strings.Replace(path, "\\", "/", -1)
+	file, err := ioutil.ReadFile(path + myId + "/" + fileName)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "")
 		return
@@ -383,7 +383,7 @@ func ShareFile(c *gin.Context) {
 	}
 
 	generatedFileName := strings.Replace(uuid.New().String(), "-", "", -1)
-	out, err := os.Create(basePah + data.UserId + "/" + generatedFileName)
+	out, err := os.Create(path + data.UserId + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "")
