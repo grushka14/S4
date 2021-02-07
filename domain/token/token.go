@@ -5,8 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/grushka14/S4/domain/user"
-
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -16,11 +14,11 @@ const secret = "supersecretkeyblabla"
 type Token (string)
 
 //CreateToken function
-func CreateToken(u user.User) (Token, error) {
+func CreateToken(email string) (Token, error) {
 	os.Setenv("ACCESS_SECRET", secret)
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
-	atClaims["email"] = u.Email
+	atClaims["email"] = email
 	atClaims["exp"] = time.Now().Add(1 * time.Hour).Unix()
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))

@@ -56,13 +56,13 @@ func GetUsers(c *gin.Context) {
 func Login(c *gin.Context) {
 	var userObj user.User
 	if err := c.ShouldBindJSON(&userObj); err != nil {
-		fmt.Println("Invalid JSON")
+		fmt.Println("Invalid Input")
 		c.JSON(http.StatusBadRequest, "")
 		return
 	}
 
 	if userObj.CheckEmail() == true {
-		token, err := token.CreateToken(userObj)
+		token, err := token.CreateToken(userObj.Email)
 		if err != nil {
 			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, "")
