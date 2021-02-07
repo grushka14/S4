@@ -13,30 +13,22 @@ type Response struct {
 
 // UsersResponse type
 type UsersResponse struct {
-	Code   int      `json:"code"`
-	Status string   `json:"status"`
-	Users  []string `json:"users"`
+	Users []string `json:"users"`
 }
 
 // GetFilesResponse type
 type GetFilesResponse struct {
-	Code   int                 `json:"code"`
-	Status string              `json:"status"`
-	Files  []map[string]string `json:"files"`
+	Files []map[string]string `json:"files"`
 }
 
 // ReadFilesResponse type
 type ReadFilesResponse struct {
-	Code   int    `json:"code"`
-	Status string `json:"status"`
-	File   []byte `json:"file"`
+	File []byte `json:"file"`
 }
 
 // LoginResponse type
 type LoginResponse struct {
-	Code   int         `json:"code"`
-	Status string      `json:"status"`
-	Token  token.Token `json:"token"`
+	Token token.Token `json:"token"`
 }
 
 // New400 func
@@ -87,8 +79,6 @@ func New204(m string) *Response {
 // New201 func
 func New201(m string) *Response {
 	return &Response{
-		Code:    204,
-		Status:  "created",
 		Message: m,
 	}
 }
@@ -96,35 +86,27 @@ func New201(m string) *Response {
 // New200GetUsers func
 func New200GetUsers(u []string) *UsersResponse {
 	return &UsersResponse{
-		Code:   200,
-		Status: "OK",
-		Users:  u,
+		Users: u,
 	}
 }
 
 // New200GetFiles func
 func New200GetFiles(u []map[string]string) *GetFilesResponse {
 	return &GetFilesResponse{
-		Code:   200,
-		Status: "OK",
-		Files:  u,
+		Files: u,
 	}
 }
 
 // New200GetFiles func
 func New200ReadFile(f []byte) *ReadFilesResponse {
 	return &ReadFilesResponse{
-		Code:   200,
-		Status: "OK",
-		File:   f,
+		File: f,
 	}
 }
 
 // New200Login func
 func New200Login(t token.Token) *LoginResponse {
 	return &LoginResponse{
-		Code:   200,
-		Status: "OK",
-		Token:  t,
+		Token: t,
 	}
 }
