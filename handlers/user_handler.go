@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/grushka14/S4/app/utils/responses"
@@ -125,8 +126,10 @@ func PutFile(c *gin.Context) {
 	user.AddFileToUser(email, generatedFileName, filename)
 
 	fmt.Println(generatedFileName)
-
-	out, err := os.Create(basePah + userId + "/" + generatedFileName)
+	path, _ := filepath.Abs("../files")
+	fmt.Printf("--")
+	fmt.Printf(path)
+	out, err := os.Create(path + userId + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "internal server error")
@@ -199,7 +202,7 @@ func DeleteFile(c *gin.Context) {
 	}
 
 	os.Remove(basePah + userId + "/" + fileName)
-	ok, err := user.RemoveFileFromUserMemory(email, fileId)
+	ok, err = user.RemoveFileFromUserMemory(email, fileId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "")
 	}

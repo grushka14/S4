@@ -157,12 +157,12 @@ func GetUserEmail(i string) (string, bool) {
 
 // RemoveFileFromUserMemory func
 func RemoveFileFromUserMemory(e string, f string) (bool, error) {
-	for _, user := range Users {
-		if user.Email == e {
-			for index, file := range user.Files {
+	for i, u := range Users {
+		if u.Email == e {
+			for j, file := range u.Files {
 				if file.FileId == f {
-					newFileSlice := append(user.Files[:index], user.Files[index+1:]...)
-					user.Files = newFileSlice
+					newFileSlice := append(u.Files[:j], u.Files[j+1:]...)
+					Users[i].Files = newFileSlice
 				}
 			}
 		}
