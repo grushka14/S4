@@ -28,3 +28,8 @@ type getFilesResponse struct {
 	ID       string `json:"id"`
 	FileName string `json:"file_name"`
 }
+
+type shareFileRequest struct {
+	FileID string `json:"file_id"`
+	UserID string `json:"user_id"`
+}

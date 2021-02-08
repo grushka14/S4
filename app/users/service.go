@@ -38,10 +38,9 @@ func extractClaims(tokenStr string) (jwt.MapClaims, bool) {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return claims, true
-	} else {
-		fmt.Println("Invalid JWT Token")
-		return nil, false
 	}
+	return nil, false
+
 }
 
 func validateToken(tokenString string) (string, error) {
