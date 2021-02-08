@@ -108,7 +108,7 @@ func PutFile(c *gin.Context) {
 		return
 	}
 
-	userId, ok := user.GetUserId(email)
+	userId, ok := user.GetUserID(email)
 	if !ok {
 		c.JSON(http.StatusBadRequest, "")
 		return
@@ -179,7 +179,7 @@ func DeleteFile(c *gin.Context) {
 		return
 	}
 
-	userId, ok := user.GetUserId(email)
+	userId, ok := user.GetUserID(email)
 	if !ok {
 		c.JSON(http.StatusBadRequest, "")
 		return
@@ -283,7 +283,7 @@ func ReadFile(c *gin.Context) {
 		return
 	}
 
-	userId, ok := user.GetUserId(email)
+	userId, ok := user.GetUserID(email)
 	if !ok {
 		c.JSON(http.StatusBadRequest, "")
 		return
@@ -359,13 +359,13 @@ func ShareFile(c *gin.Context) {
 		return
 	}
 
-	myId, _ := user.GetUserId(email)
-	if myId == data.UserId {
+	myId, _ := user.GetUserID(email)
+	if myId == data.UserID {
 		c.JSON(http.StatusBadRequest, "can not share file with your selfe")
 		return
 	}
 
-	owner, fileName, exist := user.CheckFile(data.FileId)
+	owner, fileName, exist := user.CheckFile(data.FileID)
 	if !exist {
 		c.JSON(http.StatusBadRequest, "no file with that id")
 		return
@@ -391,14 +391,14 @@ func ShareFile(c *gin.Context) {
 	}
 
 	generatedFileName := strings.Replace(uuid.New().String(), "-", "", -1)
-	out, err := os.Create(path + "/" + data.UserId + "/" + generatedFileName)
+	out, err := os.Create(path + "/" + data.UserID + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, "")
 		return
 	}
 
-	newUserEmail, _ := user.GetUserEmail(data.UserId)
+	newUserEmail, _ := user.GetUserEmail(data.UserID)
 	newKey := user.GetUserKey(newUserEmail)
 	encryptedFile, err := encryption.Encrypt(newKey, decryptedfile)
 	defer out.Close()

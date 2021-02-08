@@ -14,3 +14,17 @@ type UserFile struct {
 	FileSystemName string `json:"file"`
 	FileUserName   string `json:"file_name"`
 }
+
+type userLoginRequest struct {
+	Email string `json:"email"`
+}
+
+type getUsersResponse struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+}
+
+type getFilesResponse struct {
+	ID       string `json:"id"`
+	FileName string `json:"file_name"`
+}

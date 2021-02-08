@@ -8,6 +8,7 @@ var (
 	router = gin.Default()
 )
 
+// StartApp function
 func StartApp() {
 	mapUrls()
 	router.Run(":8081")
