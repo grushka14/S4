@@ -25,7 +25,7 @@ func LoginHandler(c *gin.Context) {
 		c.String(http.StatusOK, token)
 		return
 	}
-	c.String(http.StatusBadRequest, "Unauthorized")
+	c.String(http.StatusUnauthorized, "Unauthorized")
 }
 
 // TokenValidationMiddleware Handler function handler
@@ -52,8 +52,7 @@ func TokenValidationMiddleware(c *gin.Context) {
 
 // GetUsersHandler function handler
 func GetUsersHandler(c *gin.Context) {
-	users := getUsers()
-	c.JSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, getUsers())
 	return
 }
 
@@ -154,6 +153,8 @@ func GetReadFileHandler(c *gin.Context) {
 
 	os.Remove(filePath)
 
+	return
+
 }
 
 // PostShareFile function handler
@@ -167,9 +168,11 @@ func PostShareFile(c *gin.Context) {
 	}
 	if request.FileID == "" {
 		c.String(http.StatusBadRequest, "Invalid file_id")
+		return
 	}
 	if request.UserID == "" {
 		c.String(http.StatusBadRequest, "Invalid user_id")
+		return
 	}
 	if !checkFileOwner(userID, request.FileID) {
 		c.String(http.StatusUnauthorized, "You can only share your files")
@@ -208,4 +211,6 @@ func PostShareFile(c *gin.Context) {
 	}
 	addFileToUser(request.UserID, generatedFileName, fileName)
 	c.String(http.StatusCreated, "created")
+
+	return
 }

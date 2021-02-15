@@ -2,7 +2,6 @@ package users
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -26,13 +25,12 @@ func initPath() string {
 }
 
 func createToken(userID string) string {
-	os.Setenv("ACCESS_SECRET", tokenSecret)
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["id"] = userID
 	atClaims["exp"] = time.Now().Add(1 * time.Hour).Unix()
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	token, err := at.SignedString([]byte(tokenSecret))
 	if err != nil {
 		fmt.Println(err)
 		return ""
