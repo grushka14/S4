@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/grushka14/S4/encryption"
@@ -18,21 +17,21 @@ import (
 func LoginHandler(c *gin.Context) {
 	var request userLoginRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, "Bad Parameters")
+		c.String(http.StatusBadRequest, "Bad Parameters")
 		return
 	}
 	token := validateUser(request.Email)
-	if !strings.EqualFold(token, "") {
-		c.JSON(http.StatusOK, token)
+	if token != "" {
+		c.String(http.StatusOK, token)
 		return
 	}
-	c.JSON(http.StatusBadRequest, "Unauthorized")
+	c.String(http.StatusBadRequest, "Unauthorized")
 }
 
 // TokenValidationMiddleware Handler function handler
 func TokenValidationMiddleware(c *gin.Context) {
 	if c.Request.Header["Authorization"] == nil {
-		c.JSON(http.StatusUnauthorized, "Unauthorized - Please use a valid token")
+		c.String(http.StatusUnauthorized, "Unauthorized - Please use a valid token")
 		c.Abort()
 		return
 	}
@@ -44,8 +43,8 @@ func TokenValidationMiddleware(c *gin.Context) {
 		return
 	}
 	userID := claims["id"].(string)
-	if strings.EqualFold(userID, "") {
-		c.JSON(http.StatusUnauthorized, "Unauthorized - Please use a valid token")
+	if userID == "" {
+		c.String(http.StatusUnauthorized, "Unauthorized - Please use a valid token")
 		c.Abort()
 		return
 	}
@@ -69,12 +68,10 @@ func PutFileHandler(c *gin.Context) {
 	}
 	filename := header.Filename
 	generatedFileName := strings.Replace(uuid.New().String(), "-", "", -1)
-	path, _ := filepath.Abs("../S4/files")
-	path = strings.Replace(path, "\\", "/", -1)
-	out, err := os.Create(path + "/" + userID + "/" + generatedFileName)
+	out, err := os.Create(service.Path + "/" + userID + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusInternalServerError, "Internal server error")
+		c.String(http.StatusInternalServerError, "Internal server error")
 		return
 	}
 	byteFile, err := ioutil.ReadAll(file)
@@ -88,7 +85,7 @@ func PutFileHandler(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	c.JSON(http.StatusCreated, "Created")
+	c.String(http.StatusCreated, "Created")
 }
 
 // DeleteFileHandler function handler
@@ -96,19 +93,18 @@ func DeleteFileHandler(c *gin.Context) {
 	userID := extractUserIDFromToken(strings.Split(c.Request.Header["Authorization"][0], "Bearer ")[1])
 	fileID := c.Query("file-id")
 	if !checkFileOwner(userID, fileID) {
-		c.JSON(http.StatusUnauthorized, "You can only delete your files")
+		c.String(http.StatusUnauthorized, "You can only delete your files")
 		return
 	}
 	fileName := getFileSystemNameByFileID(userID, fileID)
-	if strings.EqualFold(fileName, "") {
-		c.JSON(http.StatusBadRequest, "No file with that id")
+	if fileName == "" {
+		c.String(http.StatusBadRequest, "No file with that id")
 		return
 	}
-	path, _ := filepath.Abs("../S4/files")
-	path = strings.Replace(path, "\\", "/", -1)
-	os.Remove(path + "/" + userID + "/" + fileName)
+
+	os.Remove(service.Path + "/" + userID + "/" + fileName)
 	removeFileFromUser(userID, fileID)
-	c.JSON(http.StatusOK, "Deleted")
+	c.String(http.StatusOK, "Deleted")
 }
 
 // GetFilesHandler function handler
@@ -124,69 +120,82 @@ func GetReadFileHandler(c *gin.Context) {
 	fileID := c.Query("file-id")
 	userKey := getUserKey(userID)
 	if !checkFileOwner(userID, fileID) {
-		c.JSON(http.StatusUnauthorized, "You can only delete your files")
+		c.String(http.StatusUnauthorized, "You can only delete your files")
 		return
 	}
 	fileName := getFileSystemNameByFileID(userID, fileID)
-	if strings.EqualFold(fileName, "") {
-		c.JSON(http.StatusBadRequest, "No file with that id")
+	if fileName == "" {
+		c.String(http.StatusBadRequest, "No file with that id")
 		return
 	}
-	path, _ := filepath.Abs("../S4/files")
-	path = strings.Replace(path, "\\", "/", -1)
-	file, err := ioutil.ReadFile(path + "/" + userID + "/" + fileName)
+	file, err := ioutil.ReadFile(service.Path + "/" + userID + "/" + fileName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "Something whent wrong while reading the file")
+		c.String(http.StatusInternalServerError, "Something whent wrong while reading the file")
 		return
 	}
 	decryptedfile, err := encryption.Decrypt(userKey, file)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "Something whent wrong while decrypting the file")
+		c.String(http.StatusInternalServerError, "Something whent wrong while decrypting the file")
 		return
 	}
-	c.JSON(http.StatusOK, decryptedfile)
+
+	generatedFileName := strings.Replace(uuid.New().String(), "-", "", -1)
+	filePath := service.Path + "/" + userID + "/" + generatedFileName + "DELETE"
+	out, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println(err)
+		c.String(http.StatusInternalServerError, "Internal server error")
+		return
+	}
+	defer out.Close()
+	_, err = out.Write(decryptedfile)
+
+	c.File(filePath)
+
+	os.Remove(filePath)
+
 }
 
+// PostShareFile function handler
 func PostShareFile(c *gin.Context) {
 	userID := extractUserIDFromToken(strings.Split(c.Request.Header["Authorization"][0], "Bearer ")[1])
 	userKey := getUserKey(userID)
 	var request shareFileRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, "Invalid Params")
+		c.String(http.StatusBadRequest, "Invalid Params")
 		return
 	}
-	if strings.EqualFold(request.FileID, "") {
-		c.JSON(http.StatusBadRequest, "Invalid file_id")
+	if request.FileID == "" {
+		c.String(http.StatusBadRequest, "Invalid file_id")
 	}
-	if strings.EqualFold(request.UserID, "") {
-		c.JSON(http.StatusBadRequest, "Invalid user_id")
+	if request.UserID == "" {
+		c.String(http.StatusBadRequest, "Invalid user_id")
 	}
 	if !checkFileOwner(userID, request.FileID) {
-		c.JSON(http.StatusUnauthorized, "You can only delete your files")
+		c.String(http.StatusUnauthorized, "You can only share your files")
 		return
 	}
 	fileName := getFileSystemNameByFileID(userID, request.FileID)
-	if strings.EqualFold(fileName, "") {
-		c.JSON(http.StatusBadRequest, "No file with that id")
+	if fileName == "" {
+		c.String(http.StatusBadRequest, "No file with that id")
 		return
 	}
-	path, _ := filepath.Abs("../S4/files")
-	path = strings.Replace(path, "\\", "/", -1)
-	file, err := ioutil.ReadFile(path + "/" + userID + "/" + fileName)
+
+	file, err := ioutil.ReadFile(service.Path + "/" + userID + "/" + fileName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "Something whent wrong while reading the file")
+		c.String(http.StatusInternalServerError, "Something whent wrong while reading the file")
 		return
 	}
 	decryptedfile, err := encryption.Decrypt(userKey, file)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "Something whent wrong while decrypting the file")
+		c.String(http.StatusInternalServerError, "Something whent wrong while decrypting the file")
 		return
 	}
 	generatedFileName := strings.Replace(uuid.New().String(), "-", "", -1)
-	out, err := os.Create(path + "/" + request.UserID + "/" + generatedFileName)
+	out, err := os.Create(service.Path + "/" + request.UserID + "/" + generatedFileName)
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusInternalServerError, "Failed to genetate new name for the file")
+		c.String(http.StatusInternalServerError, "Failed to genetate new name for the file")
 		return
 	}
 	key := getUserKey(request.UserID)
@@ -194,9 +203,9 @@ func PostShareFile(c *gin.Context) {
 	defer out.Close()
 	_, err = out.Write(encryptedFile)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "Failed to encrypt new name for the file")
+		c.String(http.StatusInternalServerError, "Failed to encrypt new name for the file")
 		return
 	}
 	addFileToUser(request.UserID, generatedFileName, fileName)
-	c.JSON(http.StatusCreated, "created")
+	c.String(http.StatusCreated, "created")
 }

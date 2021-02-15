@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -10,6 +11,19 @@ import (
 )
 
 var tokenSecret = "522ac318-c050-4ed1-a360-10aa45211f58"
+
+type serviceData struct {
+	Path string
+}
+
+var service = serviceData{
+	Path: initPath(),
+}
+
+func initPath() string {
+	path, _ := filepath.Abs("../S4/files")
+	return strings.Replace(path, "\\", "/", -1)
+}
 
 func createToken(userID string) string {
 	os.Setenv("ACCESS_SECRET", tokenSecret)
@@ -62,7 +76,7 @@ func validateToken(tokenString string) (string, error) {
 
 // Check if the email is in the database, if so generate a token and return it.
 func validateUser(email string) string {
-	userID := resolveUserID(email)
+	userID := DB.resolveUserID(email)
 	if !strings.EqualFold(userID, "") {
 		token := createToken(userID)
 		if !strings.EqualFold(token, "") {
@@ -73,7 +87,7 @@ func validateUser(email string) string {
 }
 
 func getUsers() []getUsersResponse {
-	return getAllUsers()
+	return DB.getAllUsers()
 }
 
 func extractUserIDFromToken(tokenString string) string {
@@ -88,28 +102,25 @@ func extractUserIDFromToken(tokenString string) string {
 }
 
 func getUserKey(userID string) []byte {
-	return dbGetUserSecretByID(userID)
+	return DB.dbGetUserSecretByID(userID)
 }
 
 func addFileToUser(userID string, systemFileName string, userFileName string) {
-	dbAddFileToUser(userID, systemFileName, userFileName)
+	DB.dbAddFileToUser(userID, systemFileName, userFileName)
 }
 
 func checkFileOwner(userID string, fileID string) bool {
-	if dbcheckFileOwner(userID, fileID) {
-		return true
-	}
-	return false
+	return DB.dbcheckFileOwner(userID, fileID)
 }
 
 func getFileSystemNameByFileID(userID string, fileID string) string {
-	return dbGetFileSystemNameByFileID(userID, fileID)
+	return DB.dbGetFileSystemNameByFileID(userID, fileID)
 }
 
 func removeFileFromUser(userID string, fileID string) {
-	dbRemoveFileFromUser(userID, fileID)
+	DB.dbRemoveFileFromUser(userID, fileID)
 }
 
 func getFilesByUserID(userID string) []getFilesResponse {
-	return dbGetFilesByUserID(userID)
+	return DB.dbGetFilesByUserID(userID)
 }
