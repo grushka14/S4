@@ -75,9 +75,9 @@ func validateToken(tokenString string) (string, error) {
 // Check if the email is in the database, if so generate a token and return it.
 func validateUser(email string) string {
 	userID := DB.resolveUserID(email)
-	if !strings.EqualFold(userID, "") {
+	if userID != "" {
 		token := createToken(userID)
-		if !strings.EqualFold(token, "") {
+		if token != "" {
 			return token
 		}
 	}
